@@ -118,9 +118,9 @@
         <ImageView
             android:id="@+id/exo_fullscreenIv"
             android:src="@drawable/fullscreen"
-            android:layout_width="16dp"
+            android:layout_width="15dp"
             android:tint="#fff"
-            android:layout_height="16dp"/>
+            android:layout_height="15dp"/>
 
     </LinearLayout>
 

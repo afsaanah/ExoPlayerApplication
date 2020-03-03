@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             player.prepare(videosource);
             player.setPlayWhenReady(false);
 
-           
+
 
 
             playIv.setOnClickListener(new View.OnClickListener() {
@@ -100,17 +100,6 @@ public class MainActivity extends AppCompatActivity {
                       }
                   });
 
-            /*  playerView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            pauseIv.setVisibility(View.VISIBLE);
-                            pauseIv.postDelayed(new Runnable() {
-                                public void run() {
-                                    pauseIv.setVisibility(View.INVISIBLE);
-                                }
-                            }, 3000);
-                        }
-                    });*/
 
                 }
             });
@@ -118,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     player.setPlayWhenReady(false);
-
                     pauseIv.setVisibility(GONE);
                     playIv.setVisibility(View.VISIBLE);
                     playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
