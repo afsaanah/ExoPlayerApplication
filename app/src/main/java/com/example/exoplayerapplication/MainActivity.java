@@ -1,10 +1,12 @@
 package com.example.exoplayerapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
     private String url = "https://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4";
-    private ImageView playIv,pauseIv,exoPlayerFullscreen;
+    private ImageView playIv,pauseIv,exoPlayerFullscreen,exitfullscreenIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         playIv = findViewById(R.id.playIv);
         pauseIv = findViewById(R.id.pauseIv);
         exoPlayerFullscreen = findViewById(R.id.exo_fullscreenIv);
+        exitfullscreenIv=findViewById(R.id.exit_fullscreenIv);
 
 
         try {
@@ -70,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
             player.setPlayWhenReady(false);
 
 
-
-
             playIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -87,18 +88,31 @@ public class MainActivity extends AppCompatActivity {
                     }, 3000);
 
                   playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View view) {
-                          playerView.showController();
-                          playerView.setVisibility(View.VISIBLE);
-                          pauseIv.setVisibility(View.VISIBLE);
-                          pauseIv.postDelayed(new Runnable() {
-                              public void run() {
-                                  pauseIv.setVisibility(View.INVISIBLE);
-                              }
-                          }, 3000);
-                      }
-                  });
+                        @Override
+                        public void onClick(View view) {
+                            playerView.showController();
+                            playerView.setVisibility(View.VISIBLE);
+                            pauseIv.setVisibility(View.VISIBLE);
+                            pauseIv.postDelayed(new Runnable() {
+                                public void run() {
+                                    pauseIv.setVisibility(View.INVISIBLE);
+                                }
+                            }, 3000);
+                        }
+                    });
+                    exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            fullscreen();
+                        }
+                    });
+                    exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            exitfullscreen();
+                        }
+                    });
+
 
 
                 }
@@ -116,9 +130,22 @@ public class MainActivity extends AppCompatActivity {
                             pauseIv.setVisibility(GONE);
                         }
                     });
+                    exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            fullscreen();
+                        }
+                    });
+                    exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            exitfullscreen();
+                        }
+                    });
 
                 }
             });
+
 
         }
         catch (Exception e)
@@ -128,6 +155,36 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    private void fullscreen(){
 
+        playerView.showController();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
+        params.width = metrics.widthPixels;
+        params.height = metrics.heightPixels;
+        params.leftMargin = 0;
+        playerView.setLayoutParams(params);
+        exoPlayerFullscreen.setVisibility(GONE);
+        exitfullscreenIv.setVisibility(View.VISIBLE);
+
+
+    }
+
+    private void exitfullscreen(){
+        playerView.showController();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
+        params.width = (int)(300*metrics.density);
+        params.height = (int)(250*metrics.density);
+        params.leftMargin = 30;
+        playerView.setLayoutParams(params);
+        exoPlayerFullscreen.setVisibility(View.VISIBLE);
+        exitfullscreenIv.setVisibility(GONE);
+
+
+
+    }
 
 }

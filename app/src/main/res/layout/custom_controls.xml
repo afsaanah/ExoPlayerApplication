@@ -114,13 +114,26 @@
             android:textColor="#fff"
             android:textSize="12sp"
             android:textStyle="bold" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <ImageView
+            <ImageView
             android:id="@+id/exo_fullscreenIv"
             android:src="@drawable/fullscreen"
-            android:layout_width="15dp"
+            android:layout_width="12dp"
             android:tint="#fff"
-            android:layout_height="15dp"/>
+                style="@style/ExoMediaButton"
+            android:visibility="visible"
+            android:layout_height="12dp"/>
+        <ImageView
+            android:id="@+id/exit_fullscreenIv"
+            android:src="@drawable/exit_fullscreen"
+            android:layout_width="12dp"
+            android:tint="#fff"
+            android:visibility="gone"
+            android:layout_height="12dp"/>
+        </RelativeLayout>
 
     </LinearLayout>
 
