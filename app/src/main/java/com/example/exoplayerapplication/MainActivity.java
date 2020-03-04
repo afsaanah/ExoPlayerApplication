@@ -2,11 +2,16 @@ package com.example.exoplayerapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
+import android.content.Context;
+
+import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,27 +32,29 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import static android.view.View.GONE;
+import static com.google.android.exoplayer2.Player.STATE_BUFFERING;
 
 
 public class MainActivity extends AppCompatActivity {
-    private SimpleExoPlayerView playerView;
+    private PlayerView playerView;
     private SimpleExoPlayer player;
     private String url = "https://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4";
     private ImageView playIv, pauseIv, exoPlayerFullscreen, exitfullscreenIv,replayIv;
     private TextView thumbnail;
-
+    private ProgressBar progress;
+    private MediaSource videosource;
+    private long position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-
-
 
         try {
             playerView = findViewById(R.id.playerview);
@@ -61,42 +68,56 @@ public class MainActivity extends AppCompatActivity {
 
             DefaultHttpDataSourceFactory defaultHttpDataSourceFactory = new DefaultHttpDataSourceFactory("exoplayer video");
             ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            MediaSource videosource = new ExtractorMediaSource(videoUri, defaultHttpDataSourceFactory, extractorsFactory, null, null);
+            videosource = new ExtractorMediaSource(videoUri, defaultHttpDataSourceFactory, extractorsFactory, null, null);
             playerView.setPlayer(player);
             player.prepare(videosource);
             player.setPlayWhenReady(false);
-            thumbnail.setVisibility(View.VISIBLE);
             replayIv.setVisibility(GONE);
 
+
            player.addListener(new Player.EventListener() {
+
+
                @Override
                public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
 
+
                }
+
 
                @Override
                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
 
                }
 
                @Override
                public void onLoadingChanged(boolean isLoading) {
 
+
                }
+
 
                @Override
                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+
+
+
+
                    switch (playbackState) {
-                       case ExoPlayer.STATE_BUFFERING:
-                           break;
+
+
                        case ExoPlayer.STATE_ENDED:
                        {
                            playIv.setVisibility(GONE);
                            pauseIv.setVisibility(GONE);
+                           progress.setVisibility(GONE);
                            replayIv.setVisibility(View.VISIBLE);
                            replayIv.setOnClickListener(new View.OnClickListener() {
                                @Override
                                public void onClick(View view) {
+                                   playIv.setVisibility(GONE);
+                                   pauseIv.setVisibility(GONE);
                                   player.seekTo(0);
                                    player.setPlayWhenReady(true);
                                    replayIv.setVisibility(GONE);
@@ -105,17 +126,34 @@ public class MainActivity extends AppCompatActivity {
                        }
 
                            break;
+                       case Player.STATE_BUFFERING:
+
+                           player.seekTo(position);
+
+
+                           break;
                        case ExoPlayer.STATE_IDLE:
+                           position = player.getCurrentPosition();
+
                            break;
-                       case ExoPlayer.STATE_READY:
-                       {
-                           break;
-                       }
+
+                           case ExoPlayer.STATE_READY:
+
+                               progress.setVisibility(View.INVISIBLE);
+
+
                        default:
+
+                           progress.setVisibility(View.INVISIBLE);
+
+                           replayIv.setVisibility(GONE);
+
                            break;
 
                    }
                }
+
+
                @Override
                public void onRepeatModeChanged(int repeatMode) {
 
@@ -128,6 +166,11 @@ public class MainActivity extends AppCompatActivity {
 
                @Override
                public void onPlayerError(ExoPlaybackException error) {
+                   progress.setVisibility(View.VISIBLE);
+                       player.stop();
+                   player.prepare(videosource);
+                   player.setPlayWhenReady(true);
+                   replayIv.setVisibility(GONE);
 
                }
 
@@ -191,73 +234,80 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void pauseVideo() {
-        player.setPlayWhenReady(false);
-        replayIv.setVisibility(GONE);
-        pauseIv.setVisibility(GONE);
-        playIv.setVisibility(View.VISIBLE);
-        playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playIv.setVisibility(View.VISIBLE);
-                pauseIv.setVisibility(GONE);
-            }
-        });
-        exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fullscreen();
-            }
-        });
-        exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                exitfullscreen();
-            }
-        });
 
-    }
+            player.setPlayWhenReady(false);
+            replayIv.setVisibility(GONE);
+            pauseIv.setVisibility(GONE);
+            playIv.setVisibility(View.VISIBLE);
+            playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playIv.setVisibility(View.VISIBLE);
+                    pauseIv.setVisibility(GONE);
+                }
+            });
+            exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fullscreen();
+                }
+            });
+            exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    exitfullscreen();
+                }
+            });
+
+
+        }
+
 
     private void playVideo() {
-        thumbnail.setVisibility(GONE);
 
-        replayIv.setVisibility(GONE);
-        player.setPlayWhenReady(true);
-        playIv.setVisibility(View.GONE);
+            thumbnail.setVisibility(GONE);
+            replayIv.setVisibility(GONE);
+            player.setPlayWhenReady(true);
+            playIv.setVisibility(View.GONE);
 
-        pauseIv.setVisibility(View.VISIBLE);
-        pauseIv.postDelayed(new Runnable() {
-            public void run() {
-                pauseIv.setVisibility(View.INVISIBLE);
-            }
-        }, 3000);
+            pauseIv.setVisibility(View.VISIBLE);
+            pauseIv.postDelayed(new Runnable() {
+                public void run() {
+                    pauseIv.setVisibility(View.INVISIBLE);
+                }
+            }, 3000);
 
-        playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playerView.showController();
-                playerView.setVisibility(View.VISIBLE);
-                pauseIv.setVisibility(View.VISIBLE);
-                pauseIv.postDelayed(new Runnable() {
-                    public void run() {
-                        pauseIv.setVisibility(View.INVISIBLE);
-                    }
-                }, 3000);
-            }
-        });
-        exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fullscreen();
-            }
-        });
-        exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                exitfullscreen();
-            }
-        });
 
-    }
+            playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playerView.showController();
+                    playerView.setVisibility(View.VISIBLE);
+                    pauseIv.setVisibility(View.VISIBLE);
+                    pauseIv.postDelayed(new Runnable() {
+                        public void run() {
+                            pauseIv.setVisibility(View.INVISIBLE);
+                        }
+                    }, 3000);
+                }
+            });
+
+
+
+            exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fullscreen();
+                }
+            });
+            exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    exitfullscreen();
+                }
+            });
+
+        }
 
 
     private void fullscreen() {
@@ -280,12 +330,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        progress.setVisibility(GONE);
+        player.setPlayWhenReady(true);
+        pauseVideo();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-        player.setPlayWhenReady(false);
-        pauseIv.setVisibility(GONE);
-        playIv.setVisibility(View.VISIBLE);
+        player.setPlayWhenReady(true);
+       pauseVideo();
     }
+
 
     private void init() {
         playIv = findViewById(R.id.playIv);
@@ -294,7 +352,10 @@ public class MainActivity extends AppCompatActivity {
         exitfullscreenIv = findViewById(R.id.exit_fullscreenIv);
         thumbnail = findViewById(R.id.thumbnail);
         replayIv =findViewById(R.id.replayIv);
+        progress = findViewById(R.id.exo_buffering);
 
     }
+
+
 
 }

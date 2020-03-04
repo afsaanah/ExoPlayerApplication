@@ -11,11 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="200dp">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+    <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/playerview"
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        app:show_buffering="always"
         app:controller_layout_id="@layout/custom_controls">
         <TextView
             android:id="@+id/thumbnail"
@@ -53,8 +54,16 @@
             android:visibility="gone">
 
         </ImageView>
+        <ProgressBar
+            android:id="@+id/exo_buffering"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible">
 
-    </com.google.android.exoplayer2.ui.SimpleExoPlayerView>
+        </ProgressBar>
+
+    </com.google.android.exoplayer2.ui.PlayerView>
 
 
     </FrameLayout>
