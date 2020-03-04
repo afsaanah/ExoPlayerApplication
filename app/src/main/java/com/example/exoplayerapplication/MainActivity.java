@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.app.Dialog;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -28,6 +29,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleExoPlayerView playerView;
     private SimpleExoPlayer player;
     private String url = "https://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4";
-    private ImageView playIv,pauseIv,exoPlayerFullscreen,exitfullscreenIv;
+    private ImageView playIv, pauseIv, exoPlayerFullscreen, exitfullscreenIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         playIv = findViewById(R.id.playIv);
         pauseIv = findViewById(R.id.pauseIv);
         exoPlayerFullscreen = findViewById(R.id.exo_fullscreenIv);
-        exitfullscreenIv=findViewById(R.id.exit_fullscreenIv);
+        exitfullscreenIv = findViewById(R.id.exit_fullscreenIv);
 
 
         try {
@@ -72,6 +74,19 @@ public class MainActivity extends AppCompatActivity {
             player.prepare(videosource);
             player.setPlayWhenReady(false);
 
+            exoPlayerFullscreen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fullscreen();
+                }
+            });
+            exitfullscreenIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    exitfullscreen();
+                }
+            });
+
 
             playIv.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -87,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 3000);
 
-                  playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+                    playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             playerView.showController();
@@ -112,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
                             exitfullscreen();
                         }
                     });
-
 
 
                 }
@@ -147,44 +161,36 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(this, ""+e, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "" + e, Toast.LENGTH_SHORT).show();
         }
 
 
     }
-    private void fullscreen(){
 
-        playerView.showController();
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
-        params.width = metrics.widthPixels;
-        params.height = metrics.heightPixels;
-        params.leftMargin = 0;
-        playerView.setLayoutParams(params);
+    private void fullscreen() {
+        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+
         exoPlayerFullscreen.setVisibility(GONE);
         exitfullscreenIv.setVisibility(View.VISIBLE);
 
 
     }
 
-    private void exitfullscreen(){
-        playerView.showController();
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
-        params.width = (int)(300*metrics.density);
-        params.height = (int)(250*metrics.density);
-        params.leftMargin = 30;
-        playerView.setLayoutParams(params);
+    private void exitfullscreen() {
+        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+
         exoPlayerFullscreen.setVisibility(View.VISIBLE);
         exitfullscreenIv.setVisibility(GONE);
 
 
-
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        player.setPlayWhenReady(false);
+        pauseIv.setVisibility(GONE);
+        playIv.setVisibility(View.VISIBLE);
+    }
 }
