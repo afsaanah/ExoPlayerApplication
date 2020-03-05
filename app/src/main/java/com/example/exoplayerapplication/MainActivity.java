@@ -2,14 +2,20 @@ package com.example.exoplayerapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -60,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         init();
 
 
@@ -116,10 +123,12 @@ try{
                            playIv.setVisibility(GONE);
                            pauseIv.setVisibility(GONE);
                            progress.setVisibility(GONE);
+                           thumbnail.setVisibility(View.VISIBLE);
                            replayIv.setVisibility(View.VISIBLE);
                            replayIv.setOnClickListener(new View.OnClickListener() {
                                @Override
                                public void onClick(View view) {
+                                   thumbnail.setVisibility(GONE);
 
                                    playIv.setVisibility(GONE);
                                    pauseIv.setVisibility(GONE);
@@ -314,7 +323,18 @@ try{
         }
 
 
+
+
+    @SuppressLint("SourceLockedOrientationActivity")
     private void fullscreen() {
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getSupportActionBar().hide();
+    /*    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
+        params.width=params.MATCH_PARENT;
+        params.height=600;
+        playerView.setLayoutParams(params);*/
+
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
 
         exoPlayerFullscreen.setVisibility(GONE);
@@ -323,12 +343,14 @@ try{
 
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private void exitfullscreen() {
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
         exoPlayerFullscreen.setVisibility(View.VISIBLE);
         exitfullscreenIv.setVisibility(GONE);
-
 
     }
 
