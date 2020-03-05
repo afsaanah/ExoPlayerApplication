@@ -128,13 +128,7 @@ try{
                                    replayIv.setVisibility(GONE);
                                }
                            });
-                           playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
-                               @Override
-                               public void onClick(View view) {
-                                   playIv.setVisibility(GONE);
-                                   pauseIv.setVisibility(GONE);
-                               }
-                           });
+
                        }
 
                            break;
@@ -146,7 +140,7 @@ try{
                        case ExoPlayer.STATE_IDLE:
                            player.prepare(videosource);
                            player.seekTo(position);
-                           
+
                            break;
 
 
