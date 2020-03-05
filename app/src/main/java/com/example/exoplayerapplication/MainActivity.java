@@ -336,6 +336,7 @@ try{
         playerView.setLayoutParams(params);*/
 
         playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        playerView.requestFocus();
 
         exoPlayerFullscreen.setVisibility(GONE);
         exitfullscreenIv.setVisibility(View.VISIBLE);
