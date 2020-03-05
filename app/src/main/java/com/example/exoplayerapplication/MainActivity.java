@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -50,31 +51,34 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progress;
     private MediaSource videosource;
     private long position;
+    private BandwidthMeter bandwidthMeter;
+    private TrackSelector trackSelector;
+    private   Uri videoUri;
+    private DefaultHttpDataSourceFactory defaultHttpDataSourceFactory;
+    private ExtractorsFactory extractorsFactory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
 
-        try {
-            playerView = findViewById(R.id.playerview);
 
-
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
+            bandwidthMeter = new DefaultBandwidthMeter();
+            trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
             player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
 
-            Uri videoUri = Uri.parse(url);
+            videoUri = Uri.parse(url);
 
-            DefaultHttpDataSourceFactory defaultHttpDataSourceFactory = new DefaultHttpDataSourceFactory("exoplayer video");
-            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+           defaultHttpDataSourceFactory = new DefaultHttpDataSourceFactory("exoplayer video");
+           extractorsFactory = new DefaultExtractorsFactory();
             videosource = new ExtractorMediaSource(videoUri, defaultHttpDataSourceFactory, extractorsFactory, null, null);
+
             playerView.setPlayer(player);
             player.prepare(videosource);
             player.setPlayWhenReady(false);
             replayIv.setVisibility(GONE);
 
-
+try{
            player.addListener(new Player.EventListener() {
 
 
@@ -94,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
                @Override
                public void onLoadingChanged(boolean isLoading) {
 
-
                }
 
 
                @Override
                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+
 
 
 
@@ -116,39 +120,41 @@ public class MainActivity extends AppCompatActivity {
                            replayIv.setOnClickListener(new View.OnClickListener() {
                                @Override
                                public void onClick(View view) {
+
                                    playIv.setVisibility(GONE);
                                    pauseIv.setVisibility(GONE);
-                                  player.seekTo(0);
+                                   player.prepare(videosource);
                                    player.setPlayWhenReady(true);
                                    replayIv.setVisibility(GONE);
+                               }
+                           });
+                           playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+                               @Override
+                               public void onClick(View view) {
+                                   playIv.setVisibility(GONE);
+                                   pauseIv.setVisibility(GONE);
                                }
                            });
                        }
 
                            break;
                        case Player.STATE_BUFFERING:
-
+                           position=player.getCurrentPosition();
                            player.seekTo(position);
-
 
                            break;
                        case ExoPlayer.STATE_IDLE:
-                           position = player.getCurrentPosition();
-
+                           player.prepare(videosource);
+                           player.seekTo(position);
+                           
                            break;
 
-                           case ExoPlayer.STATE_READY:
 
-                               progress.setVisibility(View.INVISIBLE);
+                               default:
+                                   progress.setVisibility(View.INVISIBLE);
 
-
-                       default:
-
-                           progress.setVisibility(View.INVISIBLE);
-
-                           replayIv.setVisibility(GONE);
-
-                           break;
+                                   replayIv.setVisibility(GONE);
+                                   break;
 
                    }
                }
@@ -166,16 +172,20 @@ public class MainActivity extends AppCompatActivity {
 
                @Override
                public void onPlayerError(ExoPlaybackException error) {
-                   progress.setVisibility(View.VISIBLE);
-                       player.stop();
-                   player.prepare(videosource);
+
+                   position=player.getCurrentPosition();
+
+                   player.seekTo(position);
+
                    player.setPlayWhenReady(true);
+
                    replayIv.setVisibility(GONE);
 
                }
 
                @Override
                public void onPositionDiscontinuity(int reason) {
+
 
                }
 
@@ -329,18 +339,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        progress.setVisibility(GONE);
-        player.setPlayWhenReady(true);
-        pauseVideo();
-    }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        player.setPlayWhenReady(true);
+        player.setPlayWhenReady(false);
        pauseVideo();
     }
 
@@ -353,7 +357,15 @@ public class MainActivity extends AppCompatActivity {
         thumbnail = findViewById(R.id.thumbnail);
         replayIv =findViewById(R.id.replayIv);
         progress = findViewById(R.id.exo_buffering);
+        playerView = findViewById(R.id.playerview);
 
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 
