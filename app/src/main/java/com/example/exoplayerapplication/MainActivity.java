@@ -330,14 +330,14 @@ try{
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getSupportActionBar().hide();
-    /*    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
         params.width=params.MATCH_PARENT;
-        params.height=600;
-        playerView.setLayoutParams(params);*/
+        params.height=params.MATCH_PARENT;
+        playerView.setLayoutParams(params);
 
-        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+   /*     playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         playerView.requestFocus();
-
+*/
         exoPlayerFullscreen.setVisibility(GONE);
         exitfullscreenIv.setVisibility(View.VISIBLE);
 
