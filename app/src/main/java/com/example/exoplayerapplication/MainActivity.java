@@ -125,15 +125,20 @@ try{
                            progress.setVisibility(GONE);
                            thumbnail.setVisibility(View.VISIBLE);
                            replayIv.setVisibility(View.VISIBLE);
+                           playerView.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+                               @Override
+                               public void onClick(View view) {
+                                   playIv.setVisibility(GONE);
+                                   pauseIv.setVisibility(GONE);
+                               }
+                           });
                            replayIv.setOnClickListener(new View.OnClickListener() {
                                @Override
                                public void onClick(View view) {
-                                   thumbnail.setVisibility(GONE);
 
-                                   playIv.setVisibility(GONE);
-                                   pauseIv.setVisibility(GONE);
                                    player.prepare(videosource);
-                                   player.setPlayWhenReady(true);
+                                   player.seekTo(0);
+                                   playVideo();
                                    replayIv.setVisibility(GONE);
                                }
                            });
@@ -348,7 +353,12 @@ try{
     private void exitfullscreen() {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) playerView.getLayoutParams();
+        params.width=params.MATCH_PARENT;
+        params.height=550;
+        playerView.setLayoutParams(params);
+
+   /*     playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);*/
 
         exoPlayerFullscreen.setVisibility(View.VISIBLE);
         exitfullscreenIv.setVisibility(GONE);
